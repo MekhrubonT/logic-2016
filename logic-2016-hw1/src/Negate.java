@@ -1,14 +1,13 @@
 import java.util.HashMap;
 
-/**
- * Created by Lenovo on 13.10.2016.
- */
 public class Negate extends Expression {
-    Expression neg;
     final int NEGATE = 1;
+    Expression neg;
+
     Negate(Expression neg) {
         this.neg = neg;
         instance = NEGATE;
+        cachedHashCode = '!' + neg.hashCode() * HASHP;
     }
 
     public String toString() {
@@ -16,9 +15,6 @@ public class Negate extends Expression {
     }
 
     public boolean equalStruct(Expression o, HashMap<String, String> d, boolean type) {
-        if (o == null || o.instance != instance) {
-            return false;
-        }
-        return neg.equalStruct(((Negate) o).neg, d, type);
+        return !(o == null || o.instance != instance) && neg.equalStruct(((Negate) o).neg, d, type);
     }
 }

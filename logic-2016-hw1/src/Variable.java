@@ -1,14 +1,17 @@
 import java.util.HashMap;
 
-/**
- * Created by Lenovo on 13.10.2016.
- */
 public class Variable extends Expression {
-    String name;
     final int VAR = 2;
+    String name;
+
     Variable(String name) {
         this.name = name;
         instance = VAR;
+        int res = 0;
+        for (int i = 0; i < name.length(); i++) {
+            res = res * HASHP + name.charAt(i);
+        }
+        cachedHashCode = res;
     }
 
     public String toString() {

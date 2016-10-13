@@ -1,10 +1,7 @@
-import org.omg.PortableServer.POA;
-
 import java.util.ArrayList;
+import java.util.Collections;
 
-/**
- * Created by Lenovo on 13.10.2016.
- */
+
 public class Parser {
 
     String expression;
@@ -46,11 +43,13 @@ public class Parser {
             pointer++;
             list.add(binaryOperations(pos + 1));
         }
-        Expression result = list.get(list.size() - 1);
-        for (int i = list.size() - 2; i >= 0; i--) {
-            result = new BinaryOperation(list.get(i), result, OPERATIONS[pos]);
+
+        if (OPERATIONS[pos] == BinaryOperation.Operation.CON) {
+            Collections.reverse(list);
+            return list.stream().skip(1).reduce(list.get(0), (a, b) -> new BinaryOperation(b, a, OPERATIONS[pos]));
+        } else {
+            return list.stream().skip(1).reduce(list.get(0), (a, b) -> new BinaryOperation(a, b, OPERATIONS[pos]));
         }
-        return result;
     }
     Expression unaryOperations() {
         skip();
