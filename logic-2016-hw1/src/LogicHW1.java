@@ -1,3 +1,5 @@
+import jdk.internal.util.xml.impl.Pair;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,6 +9,7 @@ public class LogicHW1 {
     final static String fileName = "D:\\logic-2016\\logic-2016-hw1\\HW1\\good6.in";
     static Parser p = new Parser();
     static Map<Expression, Integer> data;
+    static Map<Expression, ArrayList<Pair>> conRightParts;
     static HashMap<Expression, Integer> assumption;
     static ArrayList<Expression> expressions;
     static PrintWriter out;
@@ -28,7 +31,7 @@ public class LogicHW1 {
 //        System.out.println("Checking " + d);
         for (int i = 0; i < axioms.size(); i++) {
             if (axioms.get(i).equalStruct(d, new HashMap<>(), true)) {
-                out.println("Сх. акс. " + i + 1);
+                out.println("Сх. акс. " + (i + 1));
                 return true;
             }
         }
@@ -36,6 +39,7 @@ public class LogicHW1 {
     }
 
     static private boolean modusPonens(Expression b) {
+/*
         for (int i = 0; i < expressions.size(); i++) {
             Expression cur = expressions.get(i);
             if (cur.instance == BinaryOperation.BINARYOPERATION) {
@@ -45,6 +49,16 @@ public class LogicHW1 {
                         out.println("M.P. " + data.get(spec.lhs) + ", " + i + 1);
                         return true;
                     }
+                }
+            }
+        }
+*/
+        if (conRightParts.containsKey(b)) {
+            ArrayList<Pair> arr = conRightParts.get(b);
+            for (Pair pair : arr) {
+                if (data.containsKey(pair.d)) {
+                    out.println("M.P. " + data.get(pair.d) + ", " + pair.id);
+                    return true;
                 }
             }
         }
@@ -64,6 +78,7 @@ public class LogicHW1 {
         out = new PrintWriter(new File("output.txt"));
         data = new HashMap<>();
         assumption = new HashMap<>();
+        conRightParts = new HashMap<>();
         expressions = new ArrayList<>();
 
         int ind = 0;
@@ -88,11 +103,33 @@ public class LogicHW1 {
                 out.println("Не доказано");
             }
             ind++;
+
             expressions.add(d);
             data.put(d, ind);
+            if (d.instance == BinaryOperation.BINARYOPERATION) {
+                BinaryOperation bd = (BinaryOperation) d;
+                if (bd.op == BinaryOperation.Operation.CON) {
+                    if (!conRightParts.containsKey(bd.rhs)) {
+                        conRightParts.put(bd.rhs, new ArrayList<>());
+                    }
+                    conRightParts.get(bd.rhs).add(new Pair(bd.lhs, ind));
+                }
+            }
+            if (ind % 1000 == 0)
+                System.out.println(ind);
         }
 
 
         out.close();
+    }
+
+
+    static class Pair {
+        Expression d;
+        int id;
+        Pair(Expression d, int id) {
+            this.d = d;
+            this.id = id;
+        }
     }
 }
