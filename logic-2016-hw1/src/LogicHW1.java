@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LogicHW1 {
-    final static String fileName = "D:\\logic-2016\\logic-2016-hw1\\HW1\\good6.in";
+    final static String fileName = "D:\\logic-2016\\logic-2016-hw1\\HW1\\good5.in";
     static Parser p = new Parser();
     static Map<Expression, Integer> data;
     static HashMap<Expression, Integer> assumption;
@@ -28,7 +28,7 @@ public class LogicHW1 {
 //        System.out.println("Checking " + d);
         for (int i = 0; i < axioms.size(); i++) {
             if (axioms.get(i).equalStruct(d, new HashMap<>(), true)) {
-                out.println("Сх. акс. " + i + 1);
+                out.println("Сх. акс. " + (i + 1));
                 return true;
             }
         }
@@ -42,7 +42,7 @@ public class LogicHW1 {
                 BinaryOperation spec = (BinaryOperation) cur;
                 if (spec.op == BinaryOperation.Operation.CON) {
                     if (data.containsKey(spec.lhs) && spec.rhs.hashCode() == b.hashCode()) {
-                        out.println("M.P. " + data.get(spec.lhs) + ", " + i + 1);
+                        out.println("M.P. " + data.get(spec.lhs) + ", " + (i + 1));
                         return true;
                     }
                 }
