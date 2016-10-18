@@ -2,9 +2,10 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 public class LogicHW1 {
-    static String fileName = "D:\\logic-2016\\logic-2016-hw1\\HW1\\good6.in";
+    static String fileName = "D:\\logic-2016\\logic-2016-hw1\\HW1\\tmp.in";
     static Parser p = new Parser();
     static Map<String, Integer> data;
     static Map<String, ArrayList<Pair>> conRightParts;
@@ -54,7 +55,7 @@ public class LogicHW1 {
 
     public static boolean isAssumption(String d) {
         if (assumption.containsKey(d)) {
-            out.println(assumption.get(d) + 1 + ")");
+            out.println("Предп. " + assumption.get(d) + ")");
             return true;
         }
         return false;
@@ -71,36 +72,36 @@ public class LogicHW1 {
         conRightParts = new HashMap<>();
 
         int ind = 0;
-//        String title = in.readLine();
-//        out.println(title);
-//        StringTokenizer t = new StringTokenizer(title);
-//        while (t.hasMoreTokens()) {
-//            title = t.nextToken();
-//            if (title.equals("|-")) {
-//                break;
-//            }
-//            Expression d = p.parse(title);
-//            assumption.put(d, ind);
-//            ind++;
-//        }
+        String title = in.readLine();
+        out.println(title);
+        StringTokenizer t = new StringTokenizer(title);
+        while (t.hasMoreTokens()) {
+            title = t.nextToken();
+            if (title.equals("|-")) {
+                break;
+            }
+            ind++;
+            Expression d = p.parse(title);
+            assumption.put(d.toString(), ind);
+        }
 
         ind = 0;
         for (String cur = in.readLine(); cur != null; cur = in.readLine()) {
             Expression d = p.parse(cur);
-            out.print("(" + ind + ") " + cur + " (");
+            out.print("(" + (ind + 1) + ") " + cur + " (");
             if (!isAxiom(d) && !isAssumption(d.toString()) && !modusPonens(d.toString())) {
                 out.println("Не доказано)");
-            }
-            ind++;
-
-            data.put(d.toString(), ind);
-            if (d.instance == BinaryOperation.BINARYOPERATION) {
-                BinaryOperation bd = (BinaryOperation) d;
-                if (bd.op == BinaryOperation.Operation.CON) {
-                    if (!conRightParts.containsKey(bd.rhs.toString())) {
-                        conRightParts.put(bd.rhs.toString(), new ArrayList<>());
+            } else {
+                ind++;
+                data.put(d.toString(), ind);
+                if (d.instance == BinaryOperation.BINARYOPERATION) {
+                    BinaryOperation bd = (BinaryOperation) d;
+                    if (bd.op == BinaryOperation.Operation.CON) {
+                        if (!conRightParts.containsKey(bd.rhs.toString())) {
+                            conRightParts.put(bd.rhs.toString(), new ArrayList<>());
+                        }
+                        conRightParts.get(bd.rhs.toString()).add(new Pair(bd.lhs.toString(), ind));
                     }
-                    conRightParts.get(bd.rhs.toString()).add(new Pair(bd.lhs.toString(), ind));
                 }
             }
         }

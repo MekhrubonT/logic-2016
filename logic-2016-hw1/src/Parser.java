@@ -3,7 +3,6 @@ import java.util.Collections;
 
 
 public class Parser {
-
     String expression;
     int pointer;
     BinaryOperation.Operation OPERATIONS[] =
@@ -51,6 +50,7 @@ public class Parser {
             return list.stream().skip(1).reduce(list.get(0), (a, b) -> new BinaryOperation(a, b, OPERATIONS[pos]));
         }
     }
+
     Expression unaryOperations() {
         skip();
         switch (expression.charAt(pointer)) {
