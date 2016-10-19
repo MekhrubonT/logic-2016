@@ -11,7 +11,7 @@ public class BinaryOperation extends Expression {
         op = d;
         instance = BINARYOPERATION;
 
-        cachedToString = new StringBuilder(lhs.cachedToString).append(op).append("(").append(rhs.cachedToString).append(")").toString();
+        cachedToString = lhs.cachedToString + op + "(" + rhs.cachedToString + ")";
     }
 
     public boolean equalStruct(Expression o, HashMap<String, String> d) {

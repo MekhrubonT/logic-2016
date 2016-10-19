@@ -2,13 +2,14 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 public class LogicHW1 {
-    final static String fileName = "D:\\logic-2016\\logic-2016-hw1\\HW1\\good6.in";
+    static String fileName = "D:\\logic-2016\\logic-2016-hw1\\HW1\\tmp.in";
     static Parser p = new Parser();
     static Map<String, Integer> data;
-    static HashMap<String, Integer> assumption;
-    static ArrayList<Expression> expressions;
+    static Map<String, ArrayList<Pair>> conRightParts;
+    static Map<String, Integer> assumption;
     static PrintWriter out;
     static BufferedReader in;
     private static ArrayList<Expression> axioms = new ArrayList<Expression>() {{
@@ -27,68 +28,96 @@ public class LogicHW1 {
     static boolean isAxiom(Expression d) {
         for (int i = 0; i < axioms.size(); i++) {
             if (axioms.get(i).equalStruct(d, new HashMap<>())) {
-                out.println("Сх. акс. " + (i + 1));
+                out.println("Сх. акс. " + (i + 1) + ")");
                 return true;
             }
         }
         return false;
     }
 
-    static private boolean modusPonens(Expression b) {
-        for (int i = 0; i < expressions.size(); i++) {
-            Expression cur = expressions.get(i);
-            if (cur.instance == BinaryOperation.BINARYOPERATION) {
-                BinaryOperation spec = (BinaryOperation) cur;
-                if (spec.op == BinaryOperation.Operation.CON) {
-                    if (data.containsKey(spec.lhs.toString()) && spec.rhs.hashCode() == b.hashCode()) {
-                        out.println("M.P. " + data.get(spec.lhs.toString()) + ", " + (i + 1));
-                        return true;
+    static private boolean modusPonens(String b) {
+        if (conRightParts.containsKey(b)) {
+            ArrayList<Pair> arr = conRightParts.get(b);
+            for (int i = 0; i < arr.size(); i++) {
+                Pair pair = arr.get(i);
+                if (data.containsKey(pair.d)) {
+                    if (i != 0) {
+                        arr.set(0, pair);
+                        arr.ensureCapacity(1);
                     }
+                    out.println("M.P. " + data.get(pair.d) + ", " + pair.id + ")");
+                    return true;
                 }
             }
         }
         return false;
     }
 
-    public static boolean isAssumption(Expression d) {
-        if (assumption.containsKey(d.toString())) {
-            out.println(assumption.get(d.toString()) + 1);
+    public static boolean isAssumption(String d) {
+        if (assumption.containsKey(d)) {
+            out.println("Предп. " + assumption.get(d) + ")");
             return true;
         }
         return false;
     }
 
     public static void main(String[] args) throws IOException {
+        if (args.length > 0) fileName = args[0];
         long time = System.currentTimeMillis();
+
         in = new BufferedReader(new FileReader(fileName));
         out = new PrintWriter(new File("output.txt"));
         data = new HashMap<>();
         assumption = new HashMap<>();
-        expressions = new ArrayList<>();
+        conRightParts = new HashMap<>();
+
         int ind = 0;
-////        String title = in.readLine();
-////        StringTokenizer t = new StringTokenizer(title);
-////        while (t.hasMoreTokens()) {
-////            title = t.nextToken();
-////            if (title.equals("|-")) {
-////                break;
-////            }
-////            Expression d = p.parse(title);
-////            assumption.put(d, ind);
-////            ind++;
-////        }
-//
+        String title = in.readLine();
+        out.println(title);
+        StringTokenizer t = new StringTokenizer(title);
+        while (t.hasMoreTokens()) {
+            title = t.nextToken();
+            if (title.equals("|-")) {
+                break;
+            }
+            ind++;
+            Expression d = p.parse(title);
+            assumption.put(d.toString(), ind);
+        }
+
         ind = 0;
         for (String cur = in.readLine(); cur != null; cur = in.readLine()) {
             Expression d = p.parse(cur);
-            if (!isAxiom(d) && !isAssumption(d) && !modusPonens(d)) {
-                out.println("Не доказано");
+            out.print("(" + (ind + 1) + ") " + cur + " (");
+            if (!isAxiom(d) && !isAssumption(d.toString()) && !modusPonens(d.toString())) {
+                out.println("Не доказано)");
+            } else {
+                ind++;
+                data.put(d.toString(), ind);
+                if (d.instance == BinaryOperation.BINARYOPERATION) {
+                    BinaryOperation bd = (BinaryOperation) d;
+                    if (bd.op == BinaryOperation.Operation.CON) {
+                        if (!conRightParts.containsKey(bd.rhs.toString())) {
+                            conRightParts.put(bd.rhs.toString(), new ArrayList<>());
+                        }
+                        conRightParts.get(bd.rhs.toString()).add(new Pair(bd.lhs.toString(), ind));
+                    }
+                }
             }
-            ind++;
-            expressions.add(d);
-            data.put(d.toString(), ind);
         }
+
         out.close();
         System.out.println(System.currentTimeMillis() - time);
+    }
+
+
+    static class Pair {
+        String d;
+        int id;
+
+        Pair(String d, int id) {
+            this.d = d;
+            this.id = id;
+        }
     }
 }
