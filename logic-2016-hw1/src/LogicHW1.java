@@ -1,11 +1,15 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
 public class LogicHW1 {
-    static String fileName = "D:\\logic-2016\\logic-2016-hw1\\HW1\\tmp.in";
+    //    static String fileName = "There's probadly no such file name";
+    static String fileName = "HW1//tmp.in";
     static Parser p = new Parser();
     static Map<String, Integer> data;
     static Map<String, ArrayList<Pair>> conRightParts;
@@ -61,37 +65,38 @@ public class LogicHW1 {
         return false;
     }
 
-    public static void main(String[] args) throws IOException {
-        if (args.length > 0) fileName = args[0];
-        long time = System.currentTimeMillis();
+    public static void main(String[] args) {
+        try {
+            if (args.length > 0) fileName = args[0];
+            long time = System.currentTimeMillis();
 
-        in = new BufferedReader(new FileReader(fileName));
-        out = new PrintWriter(new File("output.txt"));
-        data = new HashMap<>();
-        assumption = new HashMap<>();
-        conRightParts = new HashMap<>();
+            in = new BufferedReader(new FileReader(fileName));
+            out = new PrintWriter(new File("output.txt"));
+            data = new HashMap<>();
+            assumption = new HashMap<>();
+            conRightParts = new HashMap<>();
 
-        int ind = 0;
-        String title = in.readLine();
-        out.println(title);
-        StringTokenizer t = new StringTokenizer(title);
-        while (t.hasMoreTokens()) {
-            title = t.nextToken();
-            if (title.equals("|-")) {
-                break;
+            int ind = 0;
+            String title = in.readLine();
+            out.println(title);
+            StringTokenizer t = new StringTokenizer(title);
+            while (t.hasMoreTokens()) {
+                title = t.nextToken();
+                if (title.equals("|-")) {
+                    break;
+                }
+                ind++;
+                Expression d = p.parse(title);
+                assumption.put(d.toString(), ind);
             }
-            ind++;
-            Expression d = p.parse(title);
-            assumption.put(d.toString(), ind);
-        }
 
-        ind = 0;
-        for (String cur = in.readLine(); cur != null; cur = in.readLine()) {
-            Expression d = p.parse(cur);
-            out.print("(" + (ind + 1) + ") " + cur + " (");
-            if (!isAxiom(d) && !isAssumption(d.toString()) && !modusPonens(d.toString())) {
-                out.println("Не доказано)");
-            } else {
+            ind = 0;
+            for (String cur = in.readLine(); cur != null; cur = in.readLine()) {
+                Expression d = p.parse(cur);
+                out.print("(" + (ind + 1) + ") " + cur + " (");
+                if (!isAxiom(d) && !isAssumption(d.toString()) && !modusPonens(d.toString())) {
+                    out.println("Не доказано)");
+                }
                 ind++;
                 data.put(d.toString(), ind);
                 if (d.instance == BinaryOperation.BINARYOPERATION) {
@@ -104,10 +109,11 @@ public class LogicHW1 {
                     }
                 }
             }
+            out.close();
+            System.out.println("Time= " + (System.currentTimeMillis() - time));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        out.close();
-        System.out.println(System.currentTimeMillis() - time);
     }
 
 
