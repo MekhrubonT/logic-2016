@@ -15,6 +15,7 @@ public class AddOne extends Expression {
 
     @Override
     public boolean equalStruct(Expression o, HashMap<String, String> d) {
-        throw new RuntimeException("AddOne.equalStruct");
+//        throw new RuntimeException("AddOne.equalStruct");
+        return equals(o);
     }
 }

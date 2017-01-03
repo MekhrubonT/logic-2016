@@ -4,7 +4,7 @@ import java.util.HashMap;
  * Created by Lenovo on 26.12.2016.
  */
 public class Quantor extends Expression {
-//    final static int QUANTOR = 5;
+    //    final static int QUANTOR = 5;
     final char q;
     final Variable var;
     final Expression cur;
@@ -22,7 +22,8 @@ public class Quantor extends Expression {
 
     @Override
     public boolean equalStruct(Expression o, HashMap<String, String> d) {
-        throw new RuntimeException("Quantor.equalstruct");
+//        throw new RuntimeException("Quantor.equalstruct");
 //        return false;
+        return equals(o);
     }
 }

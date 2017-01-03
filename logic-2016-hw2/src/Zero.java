@@ -6,16 +6,17 @@ import java.util.HashMap;
 public class Zero extends Expression {
     final int ZERO = 4;
 
-    @Override
-    public boolean equalStruct(Expression o, HashMap<String, String> d) {
-        System.out.println("Variable.equalStruct");
-        System.out.println("This shouldn't be called");
-        System.exit(0);
-        return false;
-    }
-
     Zero() {
         cachedToString = "0";
         instance = ZERO;
+    }
+
+    @Override
+    public boolean equalStruct(Expression o, HashMap<String, String> d) {
+//        System.out.println("Variable.equalStruct");
+//        System.out.println("This shouldn't be called");
+//        System.exit(0);
+//        return false;
+        return equals(o);
     }
 }

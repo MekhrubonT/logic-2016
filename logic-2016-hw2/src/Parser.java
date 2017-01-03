@@ -47,7 +47,6 @@ public class Parser {
         }
 
 
-
         if (FIRSTOPERATIONS[pos] == BinaryOperation.Operation.CON) {
             Collections.reverse(list);
             return list.stream().skip(1).reduce(list.get(0), (a, b) -> new BinaryOperation(b, a, FIRSTOPERATIONS[pos]));
@@ -57,13 +56,45 @@ public class Parser {
     }
 
     Expression unaryOperations() {
+//        System.out.println("Parser.unaryOperations " + pointer);
         switch (expression.charAt(pointer)) {
             case '(':
-                pointer++;
-                Expression result = binaryOperations(0);
-                skip();
-                pointer++;
-                return result;
+//             /**/   System.out.println(pointer);
+                int level = 1, cp = pointer + 1, isExpression = 0;
+                while (level != 0 && isExpression == 0) {
+                    switch (expression.charAt(cp)) {
+                        case '(':
+                            ++level;
+                            break;
+                        case ')':
+                            --level;
+                            break;
+                        case '>':
+                        case '&':
+                        case '|':
+                        case '!':
+                        case '@':
+                        case '?':
+                        case '=':
+                            isExpression = 1;
+                            break;
+                        default:
+                            if (Character.isUpperCase(expression.charAt(cp)))
+                                isExpression = 1;
+                    }
+                    ++cp;
+                }
+//                System.out.println("it's expression? " + isExpression);
+                if (isExpression == 1) {
+                    pointer++;
+//                    System.out.println("\t" + pointer);
+                    Expression result = binaryOperations(0);
+                    assert expression.charAt(pointer) == ')';
+                    pointer++;
+                    return result;
+                } else {
+                    return predicat();
+                }
             case '!':
                 pointer++;
                 return new Negate(unaryOperations());
@@ -95,20 +126,28 @@ public class Parser {
         if (Character.isUpperCase(expression.charAt(pointer))) {
             String var = getNeededText(Character::isUpperCase);
             ArrayList<Expression> args = new ArrayList<>();
-            assert expression.charAt(pointer) == '(';
-            do {
+//            System.out.println("Here\n");
+            if (pointer < expression.length() && expression.charAt(pointer) == '(') {
+                do {
+                    ++pointer;
+                    args.add(sumand());
+                } while (expression.charAt(pointer) == ',');
+                assert expression.charAt(pointer) == ')';
                 ++pointer;
-                args.add(sumand());
-            } while (expression.charAt(pointer) == ',');
-            assert expression.charAt(pointer) == ')';
-            ++pointer;
-            Predicat predicat = new Predicat(var, args);
-            return predicat;
+            }
+
+            return new Predicat(var, args);
         } else {
             Expression t1 = sumand();
-            assert expression.charAt(pointer) == '=';
-            ++pointer;
-            return new BinaryOperation(t1, sumand(), BinaryOperation.Operation.EQV);
+//            System.out.println("t1=" + t1);
+//            System.out.println(pointer + " " + expression.length() + " " + expression.charAt(pointer));
+            if (pointer < expression.length() && expression.charAt(pointer) == '=') {
+                assert expression.charAt(pointer) == '=';
+                ++pointer;
+                return new BinaryOperation(t1, sumand(), BinaryOperation.Operation.EQV);
+            } else {
+                return t1;
+            }
         }
     }
 
@@ -120,6 +159,7 @@ public class Parser {
         }
         return l;
     }
+
     Expression multiply() {
         Expression l = iDoNotKnowHowToNameThisFunction();
         while (pointer < expression.length() && expression.charAt(pointer) == '*') {
@@ -131,23 +171,35 @@ public class Parser {
 
     Expression iDoNotKnowHowToNameThisFunction() {
         Expression res;
+//        System.out.println("Parser.iDoNotKnowHowToNameThisFunction " + pointer);
         switch (expression.charAt(pointer)) {
-            case '0' : res = new Zero(); break;
-            case '(' : ++pointer;
-                        res = sumand();
-                        assert expression.charAt(pointer) == ')';
-                        ++pointer;
+            case '0':
+                ++pointer;
+                res = new Zero();
+                break;
+            case '(':
+                ++pointer;
+//                System.out.println("Parser.iDoNotKnowHowToNameThisFunction");
+
+                res = sumand();
+//                System.out.println(res);
+//                System.out.println(pointer + " " + expression.length() + " " + expression.charAt(pointer));
+                assert expression.charAt(pointer) == ')';
+                ++pointer;
                 break;
             default:
                 String text = getNeededText(Character::isLowerCase);
+//                System.out.println("\t" + text);
                 if (pointer < expression.length() && expression.charAt(pointer) == '(') {
+//                    System.out.println("got here");
                     ArrayList<Expression> args = new ArrayList<>();
                     do {
+                        ++pointer;
                         args.add(sumand());
                     } while (expression.charAt(pointer) == ',');
                     assert expression.charAt(pointer) == ')';
                     pointer++;
-                    res = new Variable(text);
+                    res = new FuncSymbol(text, args);
                 } else {
                     res = new Variable(text);
                 }

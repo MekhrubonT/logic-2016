@@ -6,21 +6,24 @@ import java.util.HashMap;
  */
 public class Predicat extends Expression {
     final static int PREDICAT = 3;
+
     final String pred;
-//    final ArrayList<Expression> arguments;
 
     public Predicat(String pred, ArrayList<Expression> arguments) {
         this.pred = pred;
         children = arguments;
         instance = PREDICAT;
-        StringBuilder res = new StringBuilder();
-        res.append(pred).append("(");
-        for (int i = 0; i < arguments.size(); i++) {
-            res.append(arguments.get(i));
-            if (i != arguments.size() - 1)
-                res.append(",");
+        StringBuilder res = new StringBuilder().append(pred);
+        if (!arguments.isEmpty()) {
+            res.append("(");
+            for (int i = 0; i < arguments.size(); i++) {
+                res.append(arguments.get(i));
+                if (i != arguments.size() - 1)
+                    res.append(",");
+            }
+            res = res.append(")");
         }
-        cachedToString = res.append(")").toString();
+        cachedToString = res.toString();
     }
 
     @Override
