@@ -13,7 +13,7 @@ public abstract class Expression {
 
     @Override
     public int hashCode() {
-        return cachedToString.hashCode();
+        return toString().hashCode();
     }
 
     @Override

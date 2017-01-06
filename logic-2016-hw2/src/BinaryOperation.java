@@ -1,4 +1,5 @@
 import java.util.HashMap;
+import java.util.Random;
 
 public class BinaryOperation extends Expression {
     //    static final int BINARYOPERATION = 0;
@@ -14,7 +15,18 @@ public class BinaryOperation extends Expression {
         children.add(l);
         children.add(r);
 
-        cachedToString = "(" + l.cachedToString + op + r.cachedToString + ")";
+        Random rand = new Random();
+        if (op == Operation.CON && rand.nextInt() % 100 <= 80)
+            cachedToString = "(" + l.toString() + op + r.toString() + ")";
+        else
+            cachedToString = null;
+    }
+
+    @Override
+    public String toString() {
+        if (cachedToString == null)
+            return "(" + children.get(0).toString() + op + children.get(1).toString() + ")";
+        return cachedToString;
     }
 
     public boolean equalStruct(Expression other, HashMap<String, String> d) {

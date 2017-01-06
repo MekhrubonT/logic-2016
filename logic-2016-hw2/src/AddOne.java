@@ -9,7 +9,7 @@ public class AddOne extends Expression {
 
     public AddOne(Expression cur) {
         this.cur = cur;
-        cachedToString = cur.cachedToString + "\'";
+        cachedToString = cur.toString() + "\'";
         instance = ADDONE;
     }
 
