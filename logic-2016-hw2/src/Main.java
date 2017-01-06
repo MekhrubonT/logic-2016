@@ -47,7 +47,9 @@ public class Main {
         String exprS;
         int exprId;
         for (exprS = in.readLine(), exprId = 0; exprS != null; exprS = in.readLine(), ++exprId) {
-            System.out.println(exprS);
+            if (exprId % 100 == 0)
+                System.out.println(exprId);
+//            System.out.println(exprS);
             Expression expr = p.parse(exprS).getKey();
             Pair<Integer, Integer> indexes;
             Integer index;
@@ -139,7 +141,7 @@ public class Main {
                 Expression var = existPsi.children.get(0);
                 Expression psi = existPsi.children.get(1);
                 Multiset<String> freeVars = HashMultiset.create(), nonFreeVars = HashMultiset.create();
-                getFreeVars(psi, freeVars, nonFreeVars);
+                getFreeVars(phi, freeVars, nonFreeVars);
                 if (!freeVars.contains(var.toString()) && proved.containsKey(new BinaryOperation(psi, phi, BinaryOperation.Operation.CON))) {
                     return proved.get(new BinaryOperation(psi, phi, BinaryOperation.Operation.CON));
                 }
@@ -157,7 +159,7 @@ public class Main {
                 Expression psi = forAllPsi.children.get(1);
 //                System.out.println(var + " " + phi + " " + psi);
                 Multiset<String> freeVars = HashMultiset.create(), nonFreeVars = HashMultiset.create();
-                getFreeVars(psi, freeVars, nonFreeVars);
+                getFreeVars(phi, freeVars, nonFreeVars);
 //                System.out.println(freeVars);
                 if (!freeVars.contains(var.toString()) && proved.containsKey(new BinaryOperation(phi, psi, BinaryOperation.Operation.CON))) {
                     return proved.get(new BinaryOperation(phi, psi, BinaryOperation.Operation.CON));
@@ -240,16 +242,16 @@ public class Main {
     }
 
     private static boolean isExistAxiom(Expression expr) {
-        System.out.println(expr);
+//        System.out.println(expr);
         if (expr.instance == '>') {
             Expression lhs = expr.children.get(0); // Phi[x:=theta]
             Expression rhs = expr.children.get(1); // ?x Phi
             if (rhs.instance == '?') {
                 Variable x = ((Quantor) rhs).var; // x
                 Expression phi = ((Quantor) rhs).cur; // Phi
-                System.out.println(x);
-                System.out.println("?" + x + "Phi=" + rhs);
-                System.out.println("Phi[x := theta]=" + lhs);
+//                System.out.println(x);
+//                System.out.println("?" + x + "Phi=" + rhs);
+//                System.out.println("Phi[x := theta]=" + lhs);
 
                 return isRightSubstitutionMade(phi, lhs, x, null);
             }
@@ -281,8 +283,8 @@ public class Main {
     }
 
     private static boolean isRightSubstitutionMadeHelper(Expression phi, Expression rhs, Variable x, Multiset<String> nonFreeVars) {
-        System.out.println(phi + "|" + rhs);
-        System.out.println(phi.instance + " " + rhs.instance + " " + Variable.VAR + "\n");
+//        System.out.println(phi + "|" + rhs);
+//        System.out.println(phi.instance + " " + rhs.instance + " " + Variable.VAR + "\n");
         if (phi.equals(x) && !nonFreeVars.contains(phi.toString())) {
             if (d == null) {
                 getFreeVars(rhs, substitutionHelperSetForFreeVars, HashMultiset.create());

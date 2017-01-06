@@ -10,7 +10,7 @@ public class Negate extends Expression {
 
         children.add(neg);
 
-        cachedToString = "(!" + neg.cachedToString + ")";
+        cachedToString = "(!" + neg.toString() + ")";
     }
 
     public boolean equalStruct(Expression o, HashMap<String, String> d) {

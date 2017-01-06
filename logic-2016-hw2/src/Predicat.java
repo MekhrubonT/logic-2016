@@ -31,10 +31,10 @@ public class Predicat extends Expression {
         if (o == null) {
             return false;
         }
-        if (d.containsKey(cachedToString)) {
-            return d.get(cachedToString).equals(o.toString());
+        if (d.containsKey(toString())) {
+            return d.get(toString()).equals(o.toString());
         } else {
-            d.put(cachedToString, o.toString());
+            d.put(toString(), o.toString());
             return true;
         }
     }
