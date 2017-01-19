@@ -35,24 +35,22 @@ public class Main {
     private static Expression d;
 
     static void Debug() {
-//        Expression expr = p.parse("P(f(a),g(b))->?b1P(f(a),g(b1))").getKey();
-//        System.out.println(isExistAxiom(expr));
+//        Expression expr = p.parse("(a=0->(?b(a+b=0''''')))->(a=0'->(?b(a+b=0''''')))->(a=0|a=0')->(?b(a+b=0''''')))").getKey();
+//        System.out.println(isAxiom(expr));
+//
 //        System.exit(0);
     }
 
     public static void main(String[] args) throws IOException {
-        in = new BufferedReader(new FileReader("HW4\\incorrect3.in"));
-        out = new PrintWriter(new File("output1.txt"));
+        in = new BufferedReader(new FileReader("HW4\\incorrect11.in"));
+        out = new PrintWriter(new File("output.txt"));
         Debug();
         parseHyppothethis();
         String exprS;
+        freeHypVars = HashMultiset.create();
+        if (alpha != null)
+            getFreeVars(alpha, freeHypVars, HashMultiset.create());
         int exprId;
-        System.out.println("freeHypVars");
-        for (String freeHypVar : freeHypVars) {
-            System.out.println(freeHypVar);
-        }
-        System.out.println();
-        System.out.println(alpha);
         for (exprS = in.readLine(), exprId = 0; exprS != null; exprS = in.readLine(), ++exprId) {
             if (exprId % 100 == 0)
                 System.out.println(exprId);
@@ -62,7 +60,6 @@ public class Main {
             Integer index;
             proved.put(expr, exprId);
             provedList.add(expr);
-//            out.println("alpha=" + alpha);
             if (expr.equals(alpha)) {
                 out.println(alpha + "->" + alpha + "->" + alpha);
                 out.println("(" + alpha + "->" + alpha + "->" + alpha + ")->" +
@@ -84,7 +81,7 @@ public class Main {
 
                 out.println(expr);
                 out.println(expr + "->" + alpha + "->" + expr);
-                out.println("Here\t" + alpha + "->" + expr);
+                out.println(alpha + "->" + expr);
             } else if ((indexes = isMP(expr)) != null) {
                 if (alpha == null) {
                     out.println(expr);
@@ -98,7 +95,7 @@ public class Main {
                 out.println("(" + alpha + "->" + provedList.get(indexes.getValue()) + ")->"
                         + "(" + alpha + "->" + expr + ")");
 
-                out.println("Here\t" + "(" + alpha + "->" + expr + ")");
+                out.println("(" + alpha + "->" + expr + ")");
             } else if ((index = isForAllRule(expr)) != null) {
                 if (alpha == null) {
                     out.println(expr);
@@ -113,7 +110,7 @@ public class Main {
                 out.println(alpha + "&" + phi + "->" + psi);
                 out.println(alpha + "&" + phi + "->" + xPsi);
                 additionalLemma("AandBC_abc", alpha, phi, xPsi);
-                out.println("Here\t" + alpha + "->" + phi + "->" + xPsi);
+                out.println(alpha + "->" + phi + "->" + xPsi);
             } else if ((index = isExistRule(expr)) != null) {
                 if (alpha == null) {
                     out.println(expr);
@@ -128,7 +125,7 @@ public class Main {
                 out.println(psi + "->" + alpha + "->" + phi);
                 out.println(xPsi + "->" + alpha + "->" + phi);
                 additionalLemma("abc_bac", xPsi, alpha, phi);
-                out.println("Here\t" + alpha + "->" + xPsi + "->" + phi);
+                out.println(alpha + "->" + xPsi + "->" + phi);
             } else {
                 out.println("Вывод некорректен начиная с формулы номер " + exprId);
                 out.println(expr);
@@ -165,13 +162,8 @@ public class Main {
             if (forAllPsi.instance == '@') {
                 Expression var = forAllPsi.children.get(0);
                 Expression psi = forAllPsi.children.get(1);
-//                System.out.println(var + " " + phi + " " + psi);
                 Multiset<String> freeVars = HashMultiset.create(), nonFreeVars = HashMultiset.create();
                 getFreeVars(phi, freeVars, nonFreeVars);
-//                System.out.println(freeVars);
-//                System.out.println("Here\t" + expr + " " + var.toString());
-//                System.out.println(freeHypVars.contains(var.toString()));
-//                System.out.println(freeHypVars);
                 if (!freeHypVars.contains(var.toString()) && !freeVars.contains(var.toString()) && proved.containsKey(new BinaryOperation(phi, psi, BinaryOperation.Operation.CON))) {
                     return proved.get(new BinaryOperation(phi, psi, BinaryOperation.Operation.CON));
                 }
@@ -229,22 +221,13 @@ public class Main {
                 l = l.substring(res.getValue() + 1);
                 alpha = res.getKey();
                 if (l.isEmpty()) {
-//                    HashMultiset<String> temp = HashMultiset.create();
-//                    getFreeVars(res.getKey(), temp, HashMultiset.create());
-//                    for (String s : temp) {
-//                        freeHypVars.add(s);
-//                    }
                     break;
                 }
                 if (flag)
                     out.print(",");
-//                out.print(res.getKey());
                 hypoes.add(res.getKey().toString());
                 flag = true;
             }
-            System.out.println(alpha);
-//            HashMultiset<String> temp = HashMultiset.create();
-//            getFreeVars();
             out.println("|-" + alpha + "->" + r);
         }
     }
@@ -265,17 +248,12 @@ public class Main {
     }
 
     private static boolean isExistAxiom(Expression expr) {
-//        System.out.println(expr);
         if (expr.instance == '>') {
             Expression lhs = expr.children.get(0); // Phi[x:=theta]
             Expression rhs = expr.children.get(1); // ?x Phi
             if (rhs.instance == '?') {
                 Variable x = ((Quantor) rhs).var; // x
                 Expression phi = ((Quantor) rhs).cur; // Phi
-//                System.out.println(x);
-//                System.out.println("?" + x + "Phi=" + rhs);
-//                System.out.println("Phi[x := theta]=" + lhs);
-
                 return isRightSubstitutionMade(phi, lhs, x, null);
             }
         }
@@ -283,16 +261,12 @@ public class Main {
     }
 
     private static boolean isForAllAxiom(Expression expr) {
-//        System.out.println((char)expr.instance);
         if (expr.instance == '>') {
             Expression lhs = expr.children.get(0); // @x Phi
             Expression rhs = expr.children.get(1); // Phi[x := theta]
             if (lhs.instance == '@') {
-//                System.out.println("Got here");
                 Variable x = ((Quantor) lhs).var; // x
                 Expression phi = ((Quantor) lhs).cur; // Phi
-//                System.out.println(expr);
-//                System.out.println(phi + " " + x + " " + rhs);
                 return isRightSubstitutionMade(phi, rhs, x, null);
             }
         }
@@ -302,19 +276,15 @@ public class Main {
     private static boolean isRightSubstitutionMade(Expression phi, Expression rhs, Variable x, Expression dvalue) {
         d = dvalue;
         substitutionHelperSetForFreeVars = HashMultiset.create();
-//        System.out.println(d + " " + substitutionHelperSetForFreeVars.isEmpty());
         return isRightSubstitutionMadeHelper(phi, rhs, x, HashMultiset.create());
     }
 
     private static boolean isRightSubstitutionMadeHelper(Expression phi, Expression rhs, Variable x, Multiset<String> nonFreeVars) {
-//        System.out.println(phi + "|" + rhs);
-//        System.out.println(phi.instance + " " + rhs.instance + " " + Variable.VAR + "\n");
         if (phi.equals(x) && !nonFreeVars.contains(phi.toString())) {
             if (d == null) {
                 getFreeVars(rhs, substitutionHelperSetForFreeVars, HashMultiset.create());
                 d = rhs;
             } else if (!rhs.equals(d)) {
-//                System.out.println("False here");
                 return false;
             }
             for (String shouldBeFree : substitutionHelperSetForFreeVars) {
@@ -359,6 +329,7 @@ public class Main {
             case '+':
             case '=':
             case Negate.NEGATE:
+            case FuncSymbol.FUNCSYMBOL:
             case Predicat.PREDICAT:
                 for (Expression child : phi.children) {
                     getFreeVars(child, freeVars, nonFreeVars);
@@ -373,7 +344,9 @@ public class Main {
             case Variable.VAR:
                 if (!nonFreeVars.contains(phi.toString()))
                     freeVars.add(phi.toString());
+
             default:
+
                 break;
         }
     }

@@ -5,7 +5,7 @@ import java.util.HashMap;
  * Created by Lenovo on 03.01.2017.
  */
 public class FuncSymbol extends Expression {
-    static int FUNCSYMBOL = -1;
+    static final int FUNCSYMBOL = -1;
     final String var;
 
     public FuncSymbol(String text, ArrayList<Expression> args) {
